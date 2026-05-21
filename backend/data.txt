@@ -1,0 +1,79 @@
+PDF RAG Backend - Final Project Notes
+
+1) Stack
+- Node.js + Express + TypeScript
+- PDF parsing: pdf-parse
+- Embeddings: Hugging Face (@huggingface/inference), model BAAI/bge-small-en-v1.5
+- Vector DB: Pinecone
+- LLM: Groq (default model: llama-3.3-70b-versatile)
+
+2) Why this project was built manually (no LangChain first)
+- Learn each RAG step deeply: extraction, chunking, embeddings, retrieval, prompting
+- Improve debugging and tuning skills
+- Avoid black-box abstractions at the learning stage
+
+3) Current backend flow
+PDF upload
+-> extract text (page-aware)
+-> clean text
+-> semantic recursive chunking (+ overlap)
+-> generate embeddings in batches
+-> store vectors in Pinecone with metadata
+-> retrieve topK chunks for a question
+-> answer using Groq (grounded mode) or general mode
+
+4) Main routes (base: /api/pdf)
+- POST /upload
+- POST /extract-and-chunk
+- POST /generate-embeddings
+- POST /retrieve-chunks
+- POST /ask-question
+- GET /pinecone-stats
+
+5) Q&A modes
+- mode=document: answer from retrieved PDF context only
+- mode=general: answer from general model knowledge (no retrieval)
+
+6) Important metadata stored in Pinecone
+- filename
+- documentId
+- page
+- chunkIndex
+- chunkHash
+- chunkLength
+- createdAt
+- text
+
+7) Key engineering practices implemented
+- DRY: shared validation utility and centralized config
+- KISS: clear controller/service separation
+- Error handling: centralized API error middleware
+- Deterministic vector IDs for idempotent upserts and easier debugging
+
+8) Config defaults (centralized)
+- PORT=5000
+- CHUNK_SIZE=800
+- CHUNK_OVERLAP=150
+- HF_BATCH_SIZE=5
+- GROQ_CONTEXT_CHUNKS=4
+- UPLOADS_DIR=uploads
+
+9) Required environment variables
+- GROQ_API_KEY
+- HF_TOKEN
+- PINECONE_API_KEY
+- PINECONE_INDEX_NAME
+- GROQ_MODEL (optional)
+
+10) Useful commands
+- npm install
+- npm init
+- npm install express cors dotenv multer pdf-parse axios
+- npm install -D typescript ts-node-dev @types/node @types/express @types/cors @types/multer
+- npx tsc --init
+- npm install @pinecone-database/pinecone
+- npm install groq-sdk
+
+11) Reference docs
+- docs/BACKEND_FLOW.md
+- docs/GENAI_RAG_CONCEPTS.md
