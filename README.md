@@ -20,11 +20,14 @@ A full-stack RAG (Retrieval-Augmented Generation) application that lets you uplo
 
 ```
 PDF RAG/
-├── backend/          # Node.js + Express + TypeScript API
-├── frontend/         # Next.js 16 + React 19 UI
-└── docs/
-    ├── BACKEND_FLOW.md
-    └── GENAI_RAG_CONCEPTS.md
+├── backend/              # Node.js + Express + TypeScript API
+├── frontend/             # Next.js 16 + React 19 UI
+├── lanchain/             # LangChain reference demo
+│   ├── langchain-rag-demo.ts
+│   └── README.md
+├── BACKEND_FLOW.md
+├── GENAI_RAG_CONCEPTS.md
+└── LANGCHAIN_GUIDE.md
 ```
 
 ---
@@ -126,6 +129,7 @@ Question
 
 ```
 src/
+├── index.ts              # Express app entry point
 ├── config/
 │   ├── index.ts              # Centralized config + env defaults
 │   └── multer.config.ts      # File upload config
@@ -181,6 +185,7 @@ Open [http://localhost:3000](http://localhost:3000)
 app/
   page.tsx              # Main layout — lazy loads panels
   layout.tsx            # ThemeProvider + TooltipProvider + Toaster
+  globals.css
 
 components/
   upload/
@@ -199,6 +204,10 @@ components/
     ThinkingIndicator.tsx   # Bouncing dots loading animation
     ThemeProvider.tsx       # next-themes wrapper
     ThemeToggle.tsx         # Sun/moon dark mode toggle
+  ui/                       # shadcn/ui primitives
+    accordion.tsx, badge.tsx, button.tsx, card.tsx,
+    input.tsx, progress.tsx, scroll-area.tsx,
+    separator.tsx, textarea.tsx, tooltip.tsx
 
 hooks/
   usePdfPipeline.ts     # Upload → embed state machine + suggestions fetch
@@ -207,6 +216,7 @@ hooks/
 lib/
   api.ts                # All axios calls + error interceptor
   types.ts              # Shared TypeScript types
+  utils.ts              # cn() and shared utilities
 ```
 
 ### Key UX features
