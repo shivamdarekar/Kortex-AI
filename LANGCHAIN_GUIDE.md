@@ -2,7 +2,11 @@
 
 This guide explains what LangChain is, why it exists, when to use it, and how its main pieces fit together for a developer building RAG apps like this project.
 
-It is written to match the way you are already thinking about the manual backend in this repository.
+This project uses LangChain in two places:
+- **Research Agent** (`src/modules/research-agent/`) — uses `@langchain/groq` and `@langchain/core` for a two-prompt LCEL pipeline (summary → report)
+- **LangChain demo** (`lanchain/langchain-rag-demo.ts`) — standalone reference implementation of the full PDF RAG pipeline using LangChain abstractions
+
+The PDF RAG module (`src/modules/pdf-rag/`) is built manually without LangChain — intentionally, to understand every primitive.
 
 ## 1. What LangChain Is
 
@@ -39,30 +43,38 @@ Common reasons:
 
 In short, it helps when your app has more than one step and those steps should be composable.
 
-## 3. Where It Fits In Your Current Backend
+## 3. Where It Fits In This Project
 
-Your manual backend already does the classic RAG pipeline:
+The PDF RAG module already does the classic RAG pipeline manually:
 
-1. load PDF
-2. clean and split text
-3. embed chunks
-4. store vectors
-5. retrieve top matches
-6. build prompt
-7. ask the LLM
+1. load PDF (`pdf-parse`)
+2. clean and split text (custom semantic chunker)
+3. embed chunks (HuggingFace Inference API directly)
+4. store vectors (Pinecone SDK directly)
+5. retrieve top matches (Pinecone query directly)
+6. build prompt (string formatting)
+7. ask the LLM (Groq SDK directly)
 
-LangChain can express the same flow with less custom orchestration code.
+The Research Agent uses LangChain LCEL for its two-prompt pipeline:
 
-Manual version:
+```ts
+// summary
+const summary = await summaryPrompt.pipe(model).pipe(parser).invoke({ query, evidence });
 
+// report
+const report = await reportPrompt.pipe(model).pipe(parser).invoke({ query, summary, evidence });
+```
+
+This is the right tradeoff: the research pipeline has no custom primitives to learn, so LangChain's composition reduces boilerplate without hiding anything important.
+
+Manual version (PDF RAG):
 - you control every function directly
-- you decide how to pass data from one step to the next
 - you see every implementation detail
+- every failure is debuggable without digging through framework internals
 
-LangChain version:
-
-- you compose the same steps using framework abstractions
-- you get standard interfaces for loaders, retrievers, chains, and tools
+LangChain version (Research Agent):
+- you compose steps using framework abstractions
+- you get standard interfaces for prompts, models, and parsers
 - you trade some direct control for speed of development and reuse
 
 ## 4. When To Use It
@@ -435,25 +447,30 @@ You still need to care about:
 
 That is why your manual backend is valuable as a learning base.
 
-## 17. How This Maps To Your Project
+## 17. How This Maps To This Project
 
-Your current backend already implements the key RAG primitives:
+The PDF RAG module implements the key RAG primitives manually:
 
-- loader: `pdf-parse`
-- splitter: custom semantic chunking
-- embeddings: Hugging Face inference
-- vector DB: Pinecone
-- generation: Groq
-- orchestration: Express controllers and services
+| Primitive | Implementation |
+|---|---|
+| Loader | `pdf-parse` with `pagerender` hook |
+| Splitter | Custom semantic-recursive chunker |
+| Embeddings | HuggingFace Inference API directly |
+| Vector DB | Pinecone SDK directly |
+| Retriever | Pinecone query directly |
+| Generation | Groq SDK directly |
+| Orchestration | Express controllers + services |
 
-The LangChain mirror changes mostly the orchestration layer:
+The Research Agent uses LangChain for the parts where it adds value without hiding important primitives:
 
-- loaders become framework objects
-- splitters become reusable splitters
-- embedding calls become wrappers
-- retrieval becomes a retriever interface
-- prompt assembly becomes a prompt template
-- answer generation becomes a chain or runnable pipeline
+| Primitive | Implementation |
+|---|---|
+| LLM | `ChatGroq` from `@langchain/groq` |
+| Prompts | `ChatPromptTemplate` from `@langchain/core` |
+| Parser | `StringOutputParser` from `@langchain/core` |
+| Pipeline | LCEL pipe: `prompt.pipe(model).pipe(parser)` |
+
+Search and extraction (Tavily, Jina, Cheerio) are still wired manually because they are custom tools with no LangChain equivalent worth using.
 
 ## 18. Practical Developer Guidance
 
