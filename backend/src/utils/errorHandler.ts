@@ -92,6 +92,10 @@ const mapExternalServiceError = (err: unknown): ApiError | null => {
     return new ApiError(400, "Groq API key not configured. Set GROQ_API_KEY in .env");
   }
 
+  if (msg.includes("TAVILY_API_KEY")) {
+    return new ApiError(400, "Tavily API key not configured. Set TAVILY_API_KEY in .env");
+  }
+
   // Rate limiting / upstream 429s
   if (msg.match(/rate limit|429|throttl/i)) {
     return new ApiError(429, "Upstream rate limit exceeded. Try again later.");

@@ -4,16 +4,20 @@
   "description": "PDF Scrapper",
   "license": "ISC",
   "author": "Shivam",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/index.ts",
+    "start": "node dist/index.js",
     "test": "echo \"No tests yet\""
   },
   "dependencies": {
     "@huggingface/inference": "^4.13.15",
+    "@langchain/core": "^1.1.48",
+    "@langchain/groq": "^1.2.1",
     "@pinecone-database/pinecone": "^7.2.0",
+    "axios": "^1.16.1",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
