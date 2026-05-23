@@ -31,8 +31,6 @@ Kortex AI/
 ├── backend/              # Node.js + Express 5 + TypeScript API
 ├── frontend/             # Next.js + React 19 UI
 ├── lanchain/             # LangChain reference demo (standalone)
-│   ├── langchain-rag-demo.ts
-│   └── README.md
 ├── BACKEND_FLOW.md       # Deep-dive: PDF RAG + Research Agent backend wiring
 ├── GENAI_RAG_CONCEPTS.md # RAG concepts, interview prep, glossary
 └── LANGCHAIN_GUIDE.md    # LangChain concepts and when to use it
@@ -44,7 +42,7 @@ Kortex AI/
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js, React 19, TypeScript, Tailwind CSS v4 |
+| Frontend | Next.js 15, React 19, TypeScript, Tailwind CSS v4 |
 | UI Components | shadcn/ui, Radix UI, Lucide icons |
 | Backend | Node.js, Express 5, TypeScript |
 | PDF parsing | pdf-parse |
@@ -145,55 +143,22 @@ curl.exe -X POST http://localhost:5000/api/research-agent/research `
 ### Backend architecture
 
 ```
-src/
-├── index.ts                        # Bootstrap: loads env, starts server
-├── app.ts                          # Express wiring — mounts both module routers
-├── config/
-│   └── index.ts                    # Centralized config + env defaults
+backend/src/
+├── config/               # Centralized env config and defaults
 ├── modules/
-│   ├── pdf-rag/                    # Manual RAG pipeline (no LangChain)
-│   │   ├── index.ts
+│   ├── pdf-rag/          # Manual RAG pipeline (no LangChain)
 │   │   ├── config/
-│   │   │   └── multer.config.ts
-│   │   ├── routes/
-│   │   │   └── pdf.routes.ts
 │   │   ├── controllers/
-│   │   │   ├── pdfUpload.controller.ts
-│   │   │   ├── chunkingController.ts
-│   │   │   ├── embeddingController.ts
-│   │   │   ├── retrievalController.ts
-│   │   │   ├── qaController.ts
-│   │   │   └── suggestionsController.ts
+│   │   ├── routes/
 │   │   └── services/
-│   │       ├── pdfExtraction.service.ts
-│   │       ├── textCleaning.service.ts
-│   │       ├── chunkingService.ts
-│   │       ├── batchEmbedding.service.ts
-│   │       ├── pinecone.service.ts
-│   │       └── groq.service.ts
-│   └── research-agent/             # LangChain LCEL research pipeline
-│       ├── index.ts
-│       ├── types.ts
-│       ├── routes/
-│       │   └── research.routes.ts
+│   └── research-agent/   # LangChain LCEL research pipeline
 │       ├── controllers/
-│       │   └── research.controller.ts
-│       ├── workflows/
-│       │   └── research.workflow.ts  # Orchestrates all 4 stages
+│       ├── routes/
 │       ├── services/
-│       │   ├── search.service.ts     # Tavily web search
-│       │   ├── extraction.service.ts # Jina + Cheerio content extraction
-│       │   ├── report.service.ts     # Evidence block + fallback report builder
-│       │   └── llm.service.ts        # ChatGroq model factory
 │       ├── tools/
-│       │   ├── tavily.tool.ts        # Tavily API client
-│       │   └── jina.tool.ts          # Jina Reader + Cheerio fallback
-│       └── utils/
-│           ├── env.ts                # getOptionalEnv helper
-│           └── text.ts               # normalizeWhitespace, truncateText
-└── utils/
-    ├── validation.ts               # ensureFilename, buildSafeFilePath, getTopK
-    └── errorHandler.ts             # ApiError class + global error middleware
+│       ├── utils/
+│       └── workflows/
+└── utils/                # Shared error handler and validation helpers
 ```
 
 ### Research Agent pipeline
@@ -246,56 +211,18 @@ NEXT_PUBLIC_RESEARCH_AGENT_API_URL=http://localhost:5000/api/research-agent
 ### Frontend architecture
 
 ```
-app/
-  page.tsx                  # PDF RAG page — lazy loads upload + chat panels
-  research/
-    page.tsx                # Research Agent page — lazy loads ResearchPanel
-  layout.tsx                # ThemeProvider + TooltipProvider + Toaster
-  globals.css
-
-components/
-  upload/                   # PDF RAG upload UI
-    UploadZone.tsx           # Drag-and-drop file picker, error + ready states
-    UploadProgress.tsx       # Step progress bar (33% → 66% → 100%)
-    PipelineStatsPanel.tsx   # Animated reveal: pages, chunks, dimensions, vectors
-  chat/                     # PDF RAG chat UI
-    ChatPanel.tsx            # Scrollable chat history + auto-scroll
-    ChatMessage.tsx          # Markdown rendering, error bubble styling
-    ChatInput.tsx            # Textarea + document/general mode toggle + send
-    SourcesAccordion.tsx     # Collapsible source chunks with page + score
-    RetrievalTrace.tsx       # Live animated RAG pipeline steps while waiting
-    SuggestedQuestions.tsx   # 3 clickable starter question pills
-  research/                 # Research Agent UI
-    ResearchPanel.tsx        # Orchestrates research messages + input
-    ResearchMessage.tsx      # User query bubble or assistant report bubble
-    ResearchInput.tsx        # Textarea + search button
-    ResearchTrace.tsx        # Animated 4-stage pipeline trace while waiting
-    ResearchReport.tsx       # Summary bullets + full markdown report + sources
-  shared/
-    StatusBadge.tsx          # PDF pipeline status pill in header
-    ThinkingIndicator.tsx    # Bouncing dots loading animation
-    ThemeProvider.tsx        # next-themes wrapper
-    ThemeToggle.tsx          # Sun/moon dark mode toggle
-  ui/                       # shadcn/ui primitives
-    accordion.tsx, badge.tsx, button.tsx, card.tsx,
-    input.tsx, progress.tsx, scroll-area.tsx,
-    separator.tsx, textarea.tsx, tooltip.tsx
-
-features/
-  pdf-rag/                  # PDF RAG feature slice
-    hooks/
-      usePdfPipeline.ts     # Upload → embed state machine + suggestions fetch
-      useChat.ts            # Chat history, optimistic messages, ask logic
-    api.ts                  # Axios calls: upload, generateEmbeddings, askQuestion, suggestions
-    types.ts                # PipelineStatus, ChatMessage, PipelineStats, etc.
-  research-agent/           # Research Agent feature slice
-    hooks/
-      useResearchAgent.ts   # Optimistic state machine with 4 live stage transitions
-    api.ts                  # Axios call: runResearch
-    types.ts                # ResearchStatus, ResearchResult, ResearchMessage
-
-lib/
-  utils.ts                  # cn() utility
+frontend/
+├── app/                  # Next.js app router — pages and layout
+├── components/
+│   ├── upload/           # PDF upload UI (dropzone, progress, pipeline stats)
+│   ├── chat/             # PDF RAG chat UI (messages, sources, retrieval trace)
+│   ├── research/         # Research Agent UI (messages, report, pipeline trace)
+│   ├── shared/           # Cross-feature components (theme, status badges)
+│   └── ui/               # shadcn/ui primitives
+├── features/
+│   ├── pdf-rag/          # PDF RAG feature slice (hooks, api, types)
+│   └── research-agent/   # Research Agent feature slice (hooks, api, types)
+└── lib/                  # Shared utilities
 ```
 
 ### PDF RAG data flow
@@ -328,12 +255,12 @@ User types query
 
 ### Key UX features
 
-- **Optimistic UI** — both features show an instant placeholder message with a thinking animation; replaced in-place when the real response arrives
-- **Live pipeline trace (PDF RAG)** — while waiting for an answer, animated steps show embedding → Pinecone search → chunks retrieved → building context → generating answer
+- **Optimistic UI** — both features show an instant placeholder message with a thinking animation, replaced in-place when the real response arrives
+- **Live pipeline trace (PDF RAG)** — animated steps show embedding → Pinecone search → chunks retrieved → building context → generating answer while waiting
 - **Live pipeline trace (Research)** — 4 animated stages: Searching the web → Extracting page content → Summarising evidence → Writing full report
 - **PDF pipeline reveal** — after processing, sidebar shows animated checkmarks with real stats (pages, chunks, dimensions, vectors)
 - **Suggested questions** — 3 auto-generated starter questions after PDF processing, fetched non-blocking
-- **Document / General mode toggle** — switch between grounded PDF answers and general knowledge
+- **Document / General mode toggle** — switch between grounded PDF answers and general knowledge mid-conversation
 - **Dark mode** — full dark/light/system theme support via next-themes
 - **Separate routes** — PDF RAG at `/`, Research Agent at `/research` — isolated state, easy to debug independently
 
@@ -358,10 +285,10 @@ Frontend: `http://localhost:3000`
 
 Every step is implemented manually to understand what's actually happening:
 
-- **Chunking** — semantic-recursive splitting (paragraph → sentence → line → space → hard break) with configurable overlap
+- **Chunking** — semantic-recursive splitting (paragraph → sentence → line → space → hard break) with configurable size and overlap
 - **Embeddings** — direct HuggingFace Inference API calls with batching and response shape normalization
 - **Vector storage** — direct Pinecone SDK with deterministic vector IDs for idempotent upserts
 - **Retrieval** — direct cosine similarity search via Pinecone query
-- **Generation** — direct Groq SDK with grounded system prompt, token budgets enforced
+- **Generation** — direct Groq SDK with a grounded system prompt, token budgets enforced manually
 
 The research agent uses LangChain LCEL (`ChatPromptTemplate → ChatGroq → StringOutputParser`) because the pipeline is a straightforward two-prompt chain with no custom primitives to learn — it's the right tool for that job.
