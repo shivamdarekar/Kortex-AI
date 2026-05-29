@@ -14,7 +14,6 @@ export interface UploadedFile {
   size: number;
 }
 
-// Stats shown in the pipeline reveal panel after processing
 export interface PipelineStats {
   pageCount: number;
   totalTextLength: number;
@@ -26,11 +25,10 @@ export interface PipelineStats {
   pineconeNamespace: string;
 }
 
-// Per-step trace returned by /ask-question
 export interface PipelineStep {
   label: string;
   ms: number;
-  value?: number; // e.g. chunks retrieved count
+  value?: number;
 }
 
 export interface RetrievalPipeline {

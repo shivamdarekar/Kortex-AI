@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import { SuggestedQuestions } from "./SuggestedQuestions";
-import { useChat } from "@/hooks/useChat";
-import type { PipelineStatus } from "@/lib/types";
+import { useChat } from "@/features/pdf-rag/hooks/useChat";
+import type { PipelineStatus } from "@/features/pdf-rag/types";
 
 interface Props {
   filename: string | null;

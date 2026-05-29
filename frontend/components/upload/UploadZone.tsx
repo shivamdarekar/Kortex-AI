@@ -4,7 +4,7 @@ import { useRef, useState, useCallback } from "react";
 import { UploadCloud, FileText, X, AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { PipelineStatus } from "@/lib/types";
+import type { PipelineStatus } from "@/features/pdf-rag/types";
 
 interface Props {
   status: PipelineStatus;

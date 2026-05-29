@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import type { PipelineStatus } from "@/lib/types";
+import type { PipelineStatus } from "@/features/pdf-rag/types";
 
 const CONFIG: Record<PipelineStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   idle:       { label: "No document",  variant: "outline" },

@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import type { PipelineStatus } from "@/lib/types";
+import type { PipelineStatus } from "@/features/pdf-rag/types";
 
 const STEPS: { status: PipelineStatus; label: string; value: number }[] = [
   { status: "uploading",  label: "Uploading PDF",       value: 33 },

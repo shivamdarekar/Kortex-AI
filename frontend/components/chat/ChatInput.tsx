@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import type { ChatMode } from "@/lib/types";
+import type { ChatMode } from "@/features/pdf-rag/types";
 
 interface Props {
   onSend: (question: string) => void;

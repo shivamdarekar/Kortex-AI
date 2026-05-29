@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import type { RetrievalPipeline } from "@/lib/types";
+import type { RetrievalPipeline } from "@/features/pdf-rag/types";
 
 const STEP_ICONS: Record<string, string> = {
   "Question embedded":   "🔢",

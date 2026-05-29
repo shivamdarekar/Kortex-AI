@@ -5,7 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import type { SourceChunk } from "@/lib/types";
+import type { SourceChunk } from "@/features/pdf-rag/types";
 
 export const SourcesAccordion = ({ sources }: { sources: SourceChunk[] }) => {
   if (!sources.length) return null;

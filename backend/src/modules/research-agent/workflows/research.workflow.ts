@@ -89,69 +89,6 @@ Generate:
     ],
   ]);
 
-  const reportPrompt = ChatPromptTemplate.fromMessages([
-    [
-      "system",
-      `
-You are a senior technical research writer.
-
-Write grounded, evidence-based markdown reports.
-
-Rules:
-- use ONLY the provided evidence
-- do not invent facts
-- do not exaggerate claims
-- synthesize information across sources
-- highlight tradeoffs and practical considerations
-- prefer clarity over verbosity
-- avoid generic filler text
-- cite sources when relevant
-- keep recommendations realistic and evidence-backed
-
-The report should feel analytical, concise, and actionable.
-`,
-    ],
-    [
-      "user",
-      `
-Research Question:
-{query}
-
-Summary:
-{summary}
-
-Evidence:
-{evidence}
-
-Generate a markdown report with these sections:
-
-# Overview
-Brief explanation of the topic.
-
-# Key Findings
-Most important insights synthesized from evidence.
-
-# Tradeoffs / Comparisons
-Important advantages, disadvantages, or competing perspectives.
-
-# Recommendation
-Most practical recommendation based on evidence.
-
-# Caveats
-Limitations, risks, or uncertainty areas.
-
-# Sources
-List referenced source titles or URLs.
-
-Requirements:
-- keep sections concise
-- avoid repeating the same points
-- prefer analytical writing over generic summaries
-- do not include unsupported claims
-`,
-    ],
-  ]);
-
   const parser = new StringOutputParser();
 
   console.log("[research] generating summary");
@@ -162,11 +99,73 @@ Requirements:
 
   console.log("[research] generating final report");
 
-  const report = await reportPrompt.pipe(model).pipe(parser).invoke({
+  const writerPrompt = ChatPromptTemplate.fromMessages([
+    [
+      "system",
+      "You are an expert research writer. Write clear, structured and insightful reports.",
+    ],
+    [
+      "human",
+      `Write a detailed research report on the topic below.
+
+Topic: {topic}
+
+Research Gathered:
+{research}
+
+Structure the report as:
+- Introduction
+- Key Findings (minimum 3 well-explained points)
+- Conclusion
+
+IMPORTANT RULES:
+- DO NOT include a Sources or References section in the report
+- DO NOT include URLs or source citations in the report
+- Focus only on the content analysis and insights
+- Be detailed, factual and professional.`,
+    ],
+  ]);
+
+  const criticPrompt = ChatPromptTemplate.fromMessages([
+    [
+      "system",
+      "You are a sharp and constructive research critic. Be honest and specific.",
+    ],
+    [
+      "human",
+      `Review the research report below and evaluate it strictly.
+
+Report:
+{report}
+
+Respond in this exact format:
+
+Score: X/10
+
+Strengths:
+- ...
+- ...
+
+Areas to Improve:
+- ...
+- ...
+
+One line verdict:
+...`,
+    ],
+  ]);
+
+  const report = await writerPrompt.pipe(model).pipe(parser).invoke({
     query,
-    summary,
-    evidence,
+    topic: query,
+    research: `${summary}\n\n${evidence}`,
   });
+
+  const critique = await criticPrompt.pipe(model).pipe(parser).invoke({
+    report,
+  });
+
+  console.log("[research] report critique", critique);
 
   console.log("[research] workflow completed successfully");
 

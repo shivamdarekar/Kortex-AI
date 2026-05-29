@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, FileText, Layers, Cpu, Database } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import type { PipelineStats } from "@/lib/types";
+import type { PipelineStats } from "@/features/pdf-rag/types";
 
 interface Step {
   icon: React.ReactNode;

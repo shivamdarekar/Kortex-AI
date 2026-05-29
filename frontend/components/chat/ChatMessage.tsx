@@ -4,7 +4,7 @@ import { ThinkingIndicator } from "@/components/shared/ThinkingIndicator";
 import { SourcesAccordion } from "./SourcesAccordion";
 import { RetrievalTrace } from "./RetrievalTrace";
 import { cn } from "@/lib/utils";
-import type { ChatMessage as ChatMessageType, RetrievalPipeline } from "@/lib/types";
+import type { ChatMessage as ChatMessageType, RetrievalPipeline } from "@/features/pdf-rag/types";
 
 // Optimistic pipeline shown while waiting — steps animate in live
 const OPTIMISTIC_DOC_PIPELINE: RetrievalPipeline = {

@@ -5,7 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { UploadProgress } from "@/components/upload/UploadProgress";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
-import { usePdfPipeline } from "@/hooks/usePdfPipeline";
+import { ModeToggle } from "@/components/shared/ModeToggle";
+import { usePdfPipeline } from "@/features/pdf-rag/hooks/usePdfPipeline";
 
 const UploadZone = dynamic(
   () => import("@/components/upload/UploadZone").then((m) => m.UploadZone),
@@ -49,7 +50,10 @@ export default function Home() {
             {file.originalName}
           </span>
         )}
-        <ThemeToggle />
+        <nav className="flex items-center gap-4">
+          <ModeToggle />
+          <ThemeToggle />
+        </nav>
       </header>
 
       {/* Main layout */}
